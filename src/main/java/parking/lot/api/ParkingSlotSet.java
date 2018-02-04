@@ -43,11 +43,11 @@ public class ParkingSlotSet {
      * @param maxSlots the number of parking slots to create in this set.
      * @throws NumberFormatException if the parameters is less than 1.
      */
-    public ParkingSlotSet(int maxSlots) throws NumberFormatException{
+    ParkingSlotSet(int maxSlots) throws NumberFormatException{
         this.slotsAvailableSet = new HashMap<>();
         this.slotsOccupiedSet = new HashMap<>();
 
-        IntStream.range(0, maxSlots).forEach(
+        IntStream.range(1, maxSlots+1).forEach(
             id -> slotsAvailableSet.put(""+id, new ParkingSlot())
         );
 
@@ -103,8 +103,8 @@ public class ParkingSlotSet {
      */
     public Vector<String> getAllSlotsIds() {
         Vector<String> allSlotsIds = new Vector<>();
-        slotsOccupiedSet.entrySet().forEach(entry -> allSlotsIds.add(entry.getKey()));
-        slotsAvailableSet.entrySet().forEach(entry -> allSlotsIds.add(entry.getKey()));
+        slotsOccupiedSet.forEach((key, value) -> allSlotsIds.add(key));
+        slotsAvailableSet.forEach((key, value) -> allSlotsIds.add(key));
         return allSlotsIds;
     }
 }

@@ -2,7 +2,6 @@ package parking.lot.api;
 
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -43,7 +42,7 @@ public class ParkingLotApi {
     /**
      * Create object to hold the parking
      */
-    public ParkingLotApi(){
+    ParkingLotApi(){
         parkingStandard = new HashMap<>();
         parking20kw = new HashMap<>();
         parking50kw = new HashMap<>();
@@ -57,19 +56,20 @@ public class ParkingLotApi {
      */
     public String newParking(int numberOfSlots, String type) throws UnknownParkingTypeException {
         String parkingId = ""+uniqueIdCounter;
-        if(type.equals(PARKING_STANDARD_TYPE)) {
-            parkingStandard.put(""+parkingId, new ParkingSlotSet(numberOfSlots));
-        }else if(type.equals(PARKING_20kW_TYPE)) {
-            parking20kw.put(""+parkingId, new ParkingSlotSet(numberOfSlots));
-        }else if(type.equals(PARKING_50kW_TYPE)) {
-            parking50kw.put(""+parkingId, new ParkingSlotSet(numberOfSlots));
-        }else{
+        if (PARKING_STANDARD_TYPE.equals(type)) {
+            parkingStandard.put("" + parkingId, new ParkingSlotSet(numberOfSlots));
+        } else if (PARKING_20kW_TYPE.equals(type)) {
+            parking20kw.put("" + parkingId, new ParkingSlotSet(numberOfSlots));
+
+        } else if (PARKING_50kW_TYPE.equals(type)) {
+            parking50kw.put("" + parkingId, new ParkingSlotSet(numberOfSlots));
+
+        } else {
             throw new UnknownParkingTypeException("Parking type required does not exists!");
         }
         uniqueIdCounter++;
         return parkingId;
     }
-
 
     /**
      * Use this method to checking a car for a specific parking.
@@ -85,9 +85,9 @@ public class ParkingLotApi {
         ParkingSlotSet parking;
         if(type.equals(PARKING_STANDARD_TYPE)) {
             parking = parkingStandard.get(""+parkingId);
-        }else if(type.equals(PARKING_STANDARD_TYPE)) {
+        }else if(type.equals(PARKING_20kW_TYPE)) {
             parking = parking20kw.get(""+parkingId);
-        }else if(type.equals(PARKING_STANDARD_TYPE)) {
+        }else if(type.equals(PARKING_50kW_TYPE)) {
             parking = parking50kw.get(""+parkingId);
         }else{
             throw new UnknownParkingTypeException("Parking type required does not exists!");
@@ -129,9 +129,8 @@ public class ParkingLotApi {
 
     /**
      * Retrieve all the Ids for slots of a given parking lot.
-
-     * @param parkingId
-     * @return
+     * @param parkingId unique id of parking lot of interest.
+     * @return a vector with all ids.
      */
     public Vector<String> getAllSlotsIds(String parkingId) throws UnknowParkingIdException {
         ParkingSlotSet parking = parkingStandard.get(parkingId);
@@ -154,40 +153,32 @@ public class ParkingLotApi {
      */
     public Vector<String> getAllParkingIds(){
         Vector<String> parkingIdList = new Vector<>();
-        parkingIdList.addAll(getAllStandardIds());
-        parkingIdList.addAll(getAll20kwIds());
-        parkingIdList.addAll(getAll50kwIds());
+        try {
+            parkingIdList.addAll(getAllIdsForType(PARKING_STANDARD_TYPE));
+            parkingIdList.addAll(getAllIdsForType(PARKING_20kW_TYPE));
+            parkingIdList.addAll(getAllIdsForType(PARKING_50kW_TYPE));
+        } catch (UnknownParkingTypeException e) {
+            e.printStackTrace();
+        }
         return parkingIdList;
     }
 
     /**
-     * Retrieve String vector contianing all parking ids of type standard.
+     * Retrieve String vector contianing all parking ids of given type.
+     * @param type a string that is one of the accepted types.
      * @return vector containing String ids.
      */
-    public Vector<String> getAllStandardIds(){
+    private Vector<String> getAllIdsForType(String type) throws UnknownParkingTypeException {
         Vector<String> parkingIdList = new Vector<>();
-        parkingStandard.entrySet().forEach((entry)-> parkingIdList.add(entry.getKey()));
+        if (type.equals(PARKING_STANDARD_TYPE)) {
+            parkingStandard.forEach((key, value) -> parkingIdList.add(key));
+        } else if (type.equals(PARKING_20kW_TYPE)) {
+            parking20kw.forEach((key, value) -> parkingIdList.add(key));
+        } else if (type.equals(PARKING_50kW_TYPE)) {
+            parking50kw.forEach((key, value) -> parkingIdList.add(key));
+        } else {
+            throw new UnknownParkingTypeException("Parking type required does not exists!");
+        }
         return parkingIdList;
     }
-
-    /**
-     * Retrieve String vector contianing all parking ids of type 20kW.
-     * @return vector containing String ids.
-     */
-    public Vector<String> getAll20kwIds(){
-        Vector<String> parkingIdList = new Vector<>();
-        parking20kw.entrySet().forEach((entry)-> parkingIdList.add(entry.getKey()));
-        return parkingIdList;
-    }
-
-    /**
-     * Retrieve String vector contianing all parking ids of type 50kW.
-     * @return vector containing String ids.
-     */
-    public Vector<String> getAll50kwIds(){
-        Vector<String> parkingIdList = new Vector<>();
-        parking50kw.entrySet().forEach((entry)-> parkingIdList.add(entry.getKey()));
-        return parkingIdList;
-    }
-
 }

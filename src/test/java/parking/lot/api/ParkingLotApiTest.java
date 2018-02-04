@@ -38,11 +38,11 @@ public class ParkingLotApiTest {
             ParkingLotApi myApi = new ParkingLotApi();
             String parkingIdStandard = myApi.newParking(10, ParkingLotApi.PARKING_STANDARD_TYPE);
 
+            myApi.checkIn(parkingIdStandard, ParkingLotApi.PARKING_STANDARD_TYPE);
+            myApi.checkIn(parkingIdStandard, ParkingLotApi.PARKING_STANDARD_TYPE);
             String slotId = myApi.checkIn(parkingIdStandard, ParkingLotApi.PARKING_STANDARD_TYPE);
-            slotId = myApi.checkIn(parkingIdStandard, ParkingLotApi.PARKING_STANDARD_TYPE);
-            slotId = myApi.checkIn(parkingIdStandard, ParkingLotApi.PARKING_STANDARD_TYPE);
 
-            Assert.assertEquals(slotId, "3");
+            Assert.assertEquals("3", slotId);
         }catch (UnknownParkingTypeException | SlotsFullException | UnknowParkingIdException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");

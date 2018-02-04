@@ -45,7 +45,7 @@ public class ParkingSlot  {
     /**
      * Create a slot and set it as available.
      */
-    public ParkingSlot(){
+    ParkingSlot(){
         this.available = false;
     }
 
@@ -66,6 +66,7 @@ public class ParkingSlot  {
     public long checkOut(){
         this.available = true;
         long elapsedMillis = (new DateTime()).getMillis() - startTime.getMillis();
-        return elapsedMillis/1000000;
+        //convert in minutes
+        return (elapsedMillis/1000)/60;
     }
 }
