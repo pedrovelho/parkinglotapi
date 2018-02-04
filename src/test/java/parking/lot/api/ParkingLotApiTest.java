@@ -17,9 +17,9 @@ public class ParkingLotApiTest {
         try {
             ParkingApiImpl myApi = new ParkingApiImpl();
 
-            String parkingIdStandard = myApi.newParking(10, ParkingApiImpl.PARKING_STANDARD_TYPE);
-            String parkingId20kw = myApi.newParking(10, ParkingApiImpl.PARKING_20kW_TYPE);
-            String parkingId50kw = myApi.newParking(10, ParkingApiImpl.PARKING_50kW_TYPE);
+            String parkingIdStandard = myApi.newParking(10, ParkingApi.PARKING_STANDARD_TYPE);
+            String parkingId20kw = myApi.newParking(10, ParkingApi.PARKING_20kW_TYPE);
+            String parkingId50kw = myApi.newParking(10, ParkingApi.PARKING_50kW_TYPE);
 
             Assert.assertEquals(myApi.getAllParkingIds().size(), 3);
             Assert.assertEquals(myApi.getAllSlotsIds(parkingIdStandard).size(), 10);
@@ -36,11 +36,11 @@ public class ParkingLotApiTest {
     public void checkInSuccess() {
         try {
             ParkingApiImpl myApi = new ParkingApiImpl();
-            String parkingIdStandard = myApi.newParking(10, ParkingApiImpl.PARKING_STANDARD_TYPE);
+            String parkingIdStandard = myApi.newParking(10, ParkingApi.PARKING_STANDARD_TYPE);
 
-            myApi.checkIn(parkingIdStandard, ParkingApiImpl.PARKING_STANDARD_TYPE);
-            myApi.checkIn(parkingIdStandard, ParkingApiImpl.PARKING_STANDARD_TYPE);
-            String slotId = myApi.checkIn(parkingIdStandard, ParkingApiImpl.PARKING_STANDARD_TYPE);
+            myApi.checkIn(parkingIdStandard, ParkingApi.PARKING_STANDARD_TYPE);
+            myApi.checkIn(parkingIdStandard, ParkingApi.PARKING_STANDARD_TYPE);
+            String slotId = myApi.checkIn(parkingIdStandard, ParkingApi.PARKING_STANDARD_TYPE);
 
             Assert.assertEquals("3", slotId);
         }catch (UnknownParkingTypeException | SlotsFullException | UnknowParkingIdException e) {
@@ -50,12 +50,12 @@ public class ParkingLotApiTest {
     }
 
     @Test
-    public void checkOutSuccess() throws SlotNotFoundException {
+    public void checkOutSuccess()  {
         try {
             ParkingApiImpl myApi = new ParkingApiImpl();
-            String parkingIdStandard = myApi.newParking(10, ParkingApiImpl.PARKING_STANDARD_TYPE);
+            String parkingIdStandard = myApi.newParking(10, ParkingApi.PARKING_STANDARD_TYPE);
 
-            String slotId = myApi.checkIn(parkingIdStandard, ParkingApiImpl.PARKING_STANDARD_TYPE);
+            String slotId = myApi.checkIn(parkingIdStandard, ParkingApi.PARKING_STANDARD_TYPE);
 
             double price = myApi.checkOut(parkingIdStandard, slotId, (long min) -> {
                 System.out.println("Elapsed minutes "+min);
@@ -67,7 +67,7 @@ public class ParkingLotApiTest {
             });
 
             Assert.assertEquals(15, price, 0.001);
-        }catch (UnknownParkingTypeException | SlotsFullException | UnknowParkingIdException e) {
+        }catch (UnknownParkingTypeException | SlotsFullException | UnknowParkingIdException | SlotNotFoundException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
         }

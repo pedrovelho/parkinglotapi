@@ -1,6 +1,10 @@
 package parking.lot.api;
 
 
+import static parking.lot.api.ParkingApi.PARKING_20kW_TYPE;
+import static parking.lot.api.ParkingApi.PARKING_50kW_TYPE;
+import static parking.lot.api.ParkingApi.PARKING_STANDARD_TYPE;
+
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -18,21 +22,6 @@ import java.util.Vector;
  * @since 04/02/18
  */
 public class ParkingApiImpl {
-
-    /**
-     * parking type standard, used for fossil fuel cars
-     */
-    public static final String PARKING_STANDARD_TYPE = "standard";
-
-    /**
-     * parking for charging cars with 20kW outlet
-     */
-    public static final String PARKING_20kW_TYPE = "20kW";
-
-    /**
-     * parking for charging cars with 50kW outlet
-     */
-    public static final String PARKING_50kW_TYPE = "50kW";
 
     private HashMap<String, ParkingSlotSet> parkingStandard;
     private HashMap<String, ParkingSlotSet> parking20kw;
@@ -169,7 +158,7 @@ public class ParkingApiImpl {
      *                          return (minutes/60) * 1.5; //charge 1.5 the hour
      *                      });
      *                      </code>
-     *                      - First hour free, next hour 1.8, after 0.85 cents each 15 minutes
+         *                      - First hour free, next hour 1.8, after 0.85 cents each 15 minutes
      *                      <code>
      *                      for instances:
      *                      setBillingPolicy(parkingId, (minutes) -> {
