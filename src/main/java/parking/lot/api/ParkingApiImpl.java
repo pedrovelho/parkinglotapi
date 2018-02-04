@@ -17,7 +17,7 @@ import java.util.Vector;
  * @author Pedro
  * @since 04/02/18
  */
-public class ParkingLotApi {
+public class ParkingApiImpl {
 
     /**
      * parking type standard, used for fossil fuel cars
@@ -42,7 +42,7 @@ public class ParkingLotApi {
     /**
      * Create object to hold the parking
      */
-    ParkingLotApi(){
+    ParkingApiImpl(){
         parkingStandard = new HashMap<>();
         parking20kw = new HashMap<>();
         parking50kw = new HashMap<>();
@@ -111,6 +111,20 @@ public class ParkingLotApi {
      * @throws SlotNotFoundException might happen if the slot is not available for the current parkingSlot.
      */
     public double checkOut(String parkingId, String slotId, BillingPolicy function) throws UnknowParkingIdException, SlotNotFoundException {
+        ParkingSlotSet parking = findParkingById(parkingId);
+        if(parking == null){
+            throw new UnknowParkingIdException("The parking your are trying to check out does not exists!");
+        }
+        return parking.checkOut(slotId, function);
+    }
+
+    /**
+     * Find the ParkingSlotSet given an id.
+     *
+     * @param parkingId unique id of the searched parking lot.
+     * @return a ParkingSlotSet object or null if not found.
+     */
+    private ParkingSlotSet findParkingById(String parkingId){
         ParkingSlotSet parking = parkingStandard.get(parkingId);
         //tries other type if null
         if(parking == null){
@@ -119,12 +133,64 @@ public class ParkingLotApi {
         if(parking == null){
             parking = parking50kw.get(parkingId);
         }
+        return parking;
+    }
 
+    /**
+     * Checkout a car occuping slotId from the parking identified by parkingId.
+     * Use the billingPolicy associated with the parkingId. If billing policy
+     * was not previously set throws exception.
+     *
+     * @param parkingId unique id of the parking lot.
+     * @param slotId unique id of the car slot.
+     * @return the price to pay.
+     * @throws UnknowParkingIdException might happen if the parkingId does not exists.
+     * @throws SlotNotFoundException might happen if the slot is not available for the current parkingSlot.
+     * @throws BillingPolicyNotSetException rised when setBillingPolicy was not properly called.
+     */
+    public double checkOut(String parkingId, String slotId) throws UnknowParkingIdException, SlotNotFoundException, BillingPolicyNotSetException {
+        ParkingSlotSet parking = findParkingById(parkingId);
         if(parking == null){
-             throw new UnknowParkingIdException("The parking your are trying to check out does not exists!");
+            throw new UnknowParkingIdException("The parking your are trying to check out does not exists!");
         }
+        return parking.checkOut(slotId);
+    }
 
-        return parking.checkOut(slotId, function);
+    /**
+     * Specify a BillingPolicy to compute the price upon subsequent calls to checkOut omissing the
+     * parameter each time.
+     *
+     * @param parkingId the id of the parking lot.
+     * @param billingPolicy an instance of the interface or lambda expression.
+     *                   examples:
+     *                      - Bill 1.5 per hours
+     *                      <code>
+     *                      setBillingPolicy(parkingId, (minutes) -> {
+     *                          return (minutes/60) * 1.5; //charge 1.5 the hour
+     *                      });
+     *                      </code>
+     *                      - First hour free, next hour 1.8, after 0.85 cents each 15 minutes
+     *                      <code>
+     *                      for instances:
+     *                      setBillingPolicy(parkingId, (minutes) -> {
+     *                          if(minutes < 60){
+     *                              return 0;
+     *                          }else if(minutes >= 60 && minutes < 120){
+     *                              return 1.8;
+     *                          }else {
+     *                              return ((minutes-120)/15)*0.85+1.8;
+     *                          }
+     *                      });
+     *                      </code>
+     *
+     * @throws UnknownParkingTypeException
+     */
+    public void setBillingPolicy(String parkingId, BillingPolicy billingPolicy) throws UnknownParkingTypeException {
+        ParkingSlotSet parking = findParkingById(parkingId);
+        if(parking == null){
+            throw new UnknownParkingTypeException("Unable to find the parking lot for setting BillingPolicy!");
+        }
+        parking.setBillingPolicy(billingPolicy);
     }
 
     /**

@@ -37,6 +37,8 @@ public class ParkingSlotSet {
     private HashMap<String, ParkingSlot>  slotsAvailableSet;
     private HashMap<String, ParkingSlot>  slotsOccupiedSet;
 
+    private BillingPolicy billingPolicy;
+
     /**
      * Instanciate a new set of parking slots.
      *
@@ -98,6 +100,28 @@ public class ParkingSlotSet {
     }
 
     /**
+     * Checkout a vehicle and return the amount left to pay based on DEFAULT BillingPolicy.
+     * If the BillingPolicy is not set previously with setBilliingPolicy throws ...
+     *
+     * @param id the unique id of the parking slot occupied by the client.
+     * @return the price to pay based on the BillingPolicy.
+     */
+    public synchronized double checkOut(String id) throws SlotNotFoundException, BillingPolicyNotSetException {
+        if(billingPolicy == null){
+            throw new BillingPolicyNotSetException("You need to set billing policy with setBillingPolicy before calling this method!");
+        }
+        ParkingSlot parkingSlot = slotsOccupiedSet.get(id);
+        if(parkingSlot == null){
+            throw new SlotNotFoundException("Tried to checkOut parkingSlot "+id+" but it is available!");
+        }
+        long elapsedMinutes = parkingSlot.checkOut();
+        slotsOccupiedSet.remove(id);
+        slotsAvailableSet.put(id, parkingSlot);
+        return billingPolicy.bill(elapsedMinutes);
+    }
+
+
+    /**
      * Retreive vector containig all the slots id.
      * @return vector with all the slots IDs.
      */
@@ -106,5 +130,13 @@ public class ParkingSlotSet {
         slotsOccupiedSet.forEach((key, value) -> allSlotsIds.add(key));
         slotsAvailableSet.forEach((key, value) -> allSlotsIds.add(key));
         return allSlotsIds;
+    }
+
+    /**
+     * Setter for billingPolicy, this enables to call checkOut without specifying the billingPolicy.
+     * @param billingPolicy function that computes the price based on the elapsed minutes.
+     */
+    public void setBillingPolicy(BillingPolicy billingPolicy){
+        this.billingPolicy = billingPolicy;
     }
 }
